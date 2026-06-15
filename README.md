@@ -8,7 +8,7 @@
 
 I build enterprise software that reasons, not just reports. My work sits at the intersection of workflow automation, AI-native product design, and enterprise governance — building systems that detect risk, diagnose root causes, recommend actions, route approvals, and verify measurable business outcomes.
 
-Nine years in B2B SaaS. Six-plus years in product management. Sprinklr, Accorian, Aquera Labs, Delightree. Now focused on Principal PM and AI Product Leadership roles where the product has to work at enterprise scale and the stakes are real.
+Nine years in B2B SaaS. Six-plus years in product management. Sprinklr, Accorian, Aquera Labs, Delightree.
 
 ---
 

@@ -67,7 +67,7 @@ The art of AI caching is identifying which parts of the AI workflow are stable a
 **What it is:** Caching the complete AI-generated output for a specific task type and input combination, at the level of the final delivered artifact.
 
 **Application:**
-- Pre-visit brief: the brief for Location A on [DATE] is generated once, delivered to all FCs visiting that location that day. If two FCs share a location on the same day, they receive the same brief (appropriate — the underlying data is the same).
+- Pre-visit brief: the brief for Location A on June 15 is generated once, delivered to all FCs visiting that location that day. If two FCs share a location on the same day, they receive the same brief (appropriate — the underlying data is the same).
 - Weekly digest: generated once for the CS team portfolio, cached for the delivery window.
 - QBR section: generated once per account per QBR cycle, cached across all reviewers.
 
