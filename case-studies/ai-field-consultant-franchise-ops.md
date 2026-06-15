@@ -1,0 +1,223 @@
+# AI Field Consultant for Franchise Operations
+
+**One-line summary:** Augmenting franchise field consultant visits with pre-visit intelligence, real-time signal synthesis, and post-visit action routing — so that every visit is informed by everything the platform knows, and every follow-up action gets tracked to outcome.
+
+*All franchisee data in this case study is synthetic. This is a product design exercise, not a description of a specific company's internal system.*
+
+---
+
+## Context and Background
+
+Franchise networks operate through field consultants — the people who visit locations, audit compliance, identify operational gaps, and coach operators. In a 500-location network, a single field consultant may cover 40–60 locations per quarter. That is roughly 15–20 minutes of preparation time per visit if they spend a full day on visit prep.
+
+The information a field consultant needs to do a great visit is scattered: LMS completion rates in one system, mystery shop scores in another, support tickets in a third, prior visit notes in a fourth. In practice, most field consultants walk into visits with the previous visit notes and a gut feel. They miss signals. They ask questions the operator has already answered three times. They leave without full context on the operational risks that actually matter.
+
+The product opportunity is not to replace the field consultant. The visit itself — the relationship, the coaching, the on-the-ground judgment — is irreplaceable. The opportunity is to make the 30 minutes before and after the visit dramatically more intelligent.
+
+---
+
+## Problem Statement
+
+Field consultants in franchise networks spend significant time on information gathering that should be automated, and frequently miss operational risk signals that are visible in the data but not surfaced in time. Post-visit action tracking is manual and inconsistent, making it difficult to verify whether visit recommendations produced the intended results.
+
+The downstream effect is that field consultant visits are less impactful than they should be, operator experience is degraded by repetitive questions, and the franchisor loses the institutional learning that could compound across the network.
+
+---
+
+## Users and Personas
+
+**The Field Consultant (Primary):** Has 10–15 years of franchise operations experience. Deeply knowledgeable about the brand standards but overwhelmed with administrative work. Values information that is accurate and immediately actionable. Deeply sceptical of tools that add clicks. Will adopt anything that makes the actual visit better; will abandon anything that is prep work for prep work.
+
+**The Franchise Operations Director (Approver / Power User):** Owns network-wide performance. Wants visibility into visit quality, action completion rates, and which field consultants are driving the most operator improvement. Cares about consistency across the consultant team.
+
+**The Franchisee Operator (Indirect User):** Runs one to three locations. Values being understood — hates answering the same questions every visit. Wants the field consultant to arrive knowing what the issues are and to leave with a clear, trackable action plan.
+
+---
+
+## Existing Workflow Pain
+
+The current workflow:
+1. FC opens the ops platform and pulls the last visit report manually
+2. Checks LMS completion rate in a separate tool
+3. Looks up mystery shop scores in a third system
+4. Checks support ticket history in yet another system
+5. Drives to the location with incomplete context
+6. Takes notes manually during the visit
+7. Writes a visit report from memory after returning
+8. Emails action items to the operator (not tracked)
+9. Follows up manually three weeks later (or forgets)
+
+The information exists. The synthesis does not.
+
+---
+
+## Product Thesis
+
+A pre-visit intelligence brief, generated automatically from all available signals 24 hours before the visit, plus a post-visit action routing layer that tracks every commitment to outcome, will increase the quality of field consultant visits, reduce operator friction, and give franchise operations leadership the visibility they need to manage a geographically distributed consulting team.
+
+The AI layer does not replace the field consultant's judgment. It ensures that judgment is applied to the right questions, with the right context, at the right time.
+
+---
+
+## Solution Overview
+
+**Pre-Visit Brief (T-24 hours):** The system automatically compiles a location brief covering: last visit score and open action items, LMS completion rate for all required training modules, mystery shop scores for the last two periods with trend direction, support ticket volume and top issue categories for the last 90 days, sales performance relative to network average, and any new brand standards or compliance requirements active since the last visit. The brief is delivered to the FC's mobile app with a three-minute audio summary generated by TTS.
+
+**In-Visit Mode:** During the visit, the FC can ask the AI natural language questions ("What were the last three support tickets about?", "Is this operator completing their food safety modules?") and get immediate answers from the synthesised context, without switching applications. Note-taking is voice-captured and auto-structured into a visit report template.
+
+**Post-Visit Action Routing:** After the visit, the FC reviews AI-drafted action items (pre-structured from voice notes), assigns owners and due dates, and approves for distribution. Actions are routed to the operator with read receipts and acknowledgment tracking. The system sends automated reminders at defined intervals and surfaces open actions in the next pre-visit brief.
+
+---
+
+## AI-Native Layer
+
+- **Signal synthesis:** RAG pipeline pulls from LMS, mystery shop, support, sales, and prior visit data sources, chunks and indexes by location and time period, retrieves the most relevant signals for each visit
+- **Brief generation:** Prompted generation with citation enforcement — every claim in the brief is grounded in a retrieved data point with source attribution
+- **Voice capture and structuring:** Whisper-class transcription, followed by prompted extraction of action items, commitments, and risk flags into a structured JSON schema
+- **Audio summary:** Text-to-speech from generated brief for hands-free pre-visit consumption
+- **Q&A during visit:** Real-time RAG with short-context retrieval (location-scoped) for immediate in-visit questions
+- **Action item drafting:** Prompted extraction of commitments from visit notes with suggested owner, due date, and expected outcome
+
+---
+
+## Workflow and Agent Architecture
+
+```
+[Data Sources]
+  LMS API → Location Training Index
+  Mystery Shop API → Score Index
+  Support Tickets API → Issue Index
+  Sales Data API → Performance Index
+  Prior Visit Notes → Visit History Index
+
+        ↓ (nightly refresh, location-scoped)
+
+[Retrieval Layer]
+  Vector store: location embeddings, chunked by signal type
+  Hybrid retrieval: semantic + date filter + location filter
+
+        ↓ (T-24h trigger per scheduled visit)
+
+[Pre-Visit Brief Agent]
+  1. Pull scheduled visits for tomorrow
+  2. For each visit: retrieve top-N chunks per signal category
+  3. Generate brief with citation enforcement
+  4. Generate TTS audio summary
+  5. Push to FC mobile app
+
+        ↓ (during visit)
+
+[In-Visit Q&A Agent]
+  Location-scoped RAG, streaming response, <2s latency target
+
+        ↓ (visit end trigger)
+
+[Post-Visit Structuring Agent]
+  1. Transcribe voice notes
+  2. Extract action items → structured schema
+  3. FC reviews and approves
+  4. Route to operator and tracking system
+
+        ↓ (ongoing)
+
+[Action Tracking Agent]
+  Monitor due dates → send reminders
+  Surface open actions in next pre-visit brief
+  Verify completion → close loop
+```
+
+---
+
+## Key Product Decisions
+
+**1. FC approval required before any operator-facing communication.**
+The AI drafts action items but cannot send them directly to the operator. The field consultant must review and approve. This was a deliberate HITL decision: operators have a trust relationship with their FC, and a poorly drafted AI action item sent without FC awareness would damage that relationship. The approval step adds 90 seconds and removes a significant trust risk.
+
+**2. All citations visible in the brief.**
+Every claim in the pre-visit brief (e.g., "Support ticket volume is up 40% vs. last quarter") includes a source link to the underlying data. This was non-negotiable after early testing showed FCs were concerned about presenting data to operators that they could not verify. Visible citations built FC confidence in the brief.
+
+**3. Brief delivered 24 hours before, not 30 minutes.**
+Initial prototypes pushed the brief to the FC's phone the morning of the visit. Field testing showed that FCs who had the brief the night before came to visits better prepared. The extra time allowed for mental synthesis, not just data consumption. Delivery moved to T-24 hours.
+
+**4. Voice-first in-visit mode, not tap-first.**
+Field consultants are walking around a location during a visit. A tap-based interface creates awkward pauses in conversation. Voice-first with a "Hey FranBot" trigger (synthetic product name) reduced friction and increased in-visit usage significantly in prototype testing.
+
+---
+
+## Metrics and Success Criteria
+
+**Primary:**
+- Pre-visit brief open rate (target: >80% of FCs opening brief before visit)
+- Visit action item completion rate (operator side) — baseline vs. post-launch
+- FC visit score (peer/manager rating of visit quality) — baseline vs. post-launch
+
+**Secondary:**
+- Time from visit end to action item distribution (target: <2 hours vs. current average of 2.5 days)
+- Support ticket re-open rate at visited locations (proxy for visit quality)
+- FC-reported confidence score before visit (self-reported, monthly survey)
+
+**Leading indicators:**
+- Brief generation latency (<30 seconds for full brief)
+- In-visit Q&A response latency (<2 seconds)
+- Citation accuracy rate (human eval on sample of 50 briefs/month)
+
+---
+
+## Risks and Guardrails
+
+**Hallucination in briefs:** Mitigated by strict citation enforcement — the generation prompt requires every claim to be grounded in a retrieved chunk, and any claim the model cannot ground is omitted rather than generated from training data. Monthly human eval sample to verify.
+
+**Stale data:** LMS, mystery shop, and support data refresh on different schedules. The brief header shows the data-freshness timestamp for each source category. FCs are trained to note when a source says "last updated 14 days ago."
+
+**FC over-reliance:** If FCs stop exercising their own judgment and start reading the brief aloud, visit quality will decline. The brief is explicitly framed as "context for your judgment, not a script." Monitored via FC feedback and visit quality scores.
+
+**Operator perception:** Some operators may be uncomfortable knowing that the AI system has synthesised all their data before the visit. This should be disclosed in the operator agreement and positioned as a benefit: "Your FC arrives fully informed so you spend the visit solving problems, not catching up."
+
+---
+
+## GTM and Adoption Considerations
+
+The natural entry point is enterprise franchise networks (500+ locations) with existing investment in a franchise management platform. The brief feature can be positioned as an upgrade layer, not a replacement.
+
+Pilot design: 10 FCs, 2 comparable cohorts (AI brief vs. control), 90 days, measuring action item completion rate and operator satisfaction. The pilot needs a 90-day minimum to see meaningful outcome data.
+
+Activation: Brief delivery to the FC's mobile app means zero additional workflow steps for the FC — the brief appears before the visit regardless of whether they asked for it. Activation is built into the delivery mechanism.
+
+---
+
+## What I Would Build First (MVP Wedge)
+
+The pre-visit brief only, with three signal sources: last visit notes, LMS completion rate, and support ticket summary. No in-visit Q&A. No post-visit action routing. Delivered via email as a formatted PDF.
+
+This MVP tests the core value proposition — does the brief improve visit quality? — with the minimum surface area. In-visit Q&A and action routing are the second and third releases after the brief is validated.
+
+---
+
+## What I Would Measure (Instrumentation Plan)
+
+Week 1–2: Brief open rate (email open + PDF view) and FC self-reported usefulness (1-click rating in brief footer)
+
+Week 3–4: FC-reported "did you learn something new from the brief?" (yes/no, in brief footer)
+
+Month 2: Visit quality scores from operations director
+
+Month 3: Action item completion rates, support ticket trends at visited locations
+
+Ongoing: Citation accuracy sample, brief generation latency, data freshness alerts
+
+---
+
+## Lessons and Tradeoffs
+
+The most important lesson from this product design is that AI-native product value in field operations is almost never about replacing a human's role — it is about giving the human better inputs so their judgment produces better outputs. Field consultants are the product. The AI brief is a force multiplier.
+
+The tradeoff between automation and approval is real. The more the system does autonomously, the faster it operates — but in franchise contexts where the FC-operator relationship is the primary trust surface, autonomy without approval creates risk faster than it creates value. HITL is not optional here; it is the product.
+
+---
+
+## Related Resources
+
+- [AI Field Consultant PRD](/ai-prds/ai-field-consultant-prd.md)
+- [AI Field Consultant Agent Blueprint](/agent-workflow-blueprints/ai-field-consultant-agent.md)
+- [Franchise Ops AI GitHub Project](https://github.com/siddharthjaiswal1993-spec/franchise-ops-ai)
+- [HITL Design Framework](/hitl-governance/human-in-the-loop-design.md)
