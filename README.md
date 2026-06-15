@@ -24,7 +24,7 @@ The PMs who will lead this wave are not those who learned to write ChatGPT promp
 
 | Section | Description |
 |---|---|
-| [About](/about/) | Bio, positioning statement, portfolio thesis |
+| [About](/about/) | Positioning statement and portfolio thesis |
 | [Case Studies](/case-studies/) | Five polished product case studies across franchise ops, identity integration, CS intelligence, and product signal synthesis |
 | [AI PRDs](/ai-prds/) | Three detailed AI product requirements documents with full eval, HITL, and rollout plans |
 | [Agent Workflow Blueprints](/agent-workflow-blueprints/) | Seven agent architecture blueprints with Mermaid diagrams |
@@ -36,12 +36,6 @@ The PMs who will lead this wave are not those who learned to write ChatGPT promp
 | [Cost & Latency Models](/cost-latency-models/) | Five documents on AI unit economics, token cost models, model routing, caching, and latency budgets |
 | [Strategy Memos](/strategy-memos/) | Eight POV-driven strategy memos on enterprise AI, agentic workflows, moats, and the future of SaaS PM |
 | [Product Teardowns](/product-teardowns/) | Five competitive teardowns: Glean, Notion AI, Linear, Decagon, Sierra |
-| [Interview Story Bank](/interview-story-bank/) | Fifteen STAR stories tagged by competency for PM interviews |
-| [Resume & Bio](/resume-and-bio/) | Resume summary, LinkedIn About, executive bios, cold email template, recruiter one-pager |
-| [Prototype Walkthroughs](/prototype-walkthroughs/) | Ten demo walkthroughs with Loom scripts and click paths for all portfolio projects |
-| [References Template](/references-template/) | Reference sheet template |
-| [Testimonials](/testimonials/) | LinkedIn recommendation request template |
-| [Portfolio Readiness Audit](/PORTFOLIO_READINESS_AUDIT.md) | What's ready, what still needs proof, 30-day improvement roadmap |
 
 ---
 
